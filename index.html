@@ -2,251 +2,643 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KeyVault - Get Your Password</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Shadow Vault | 3D Credential Core</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: system-ui, 'Segoe UI', sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            background: radial-gradient(circle at 20% 30%, #070b17, #010101);
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 1.5rem;
+            font-family: 'Inter', sans-serif;
+            perspective: 1200px;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        .container {
-            max-width: 600px;
+        /* 3D floating orbs background */
+        body::before {
+            content: '';
+            position: fixed;
             width: 100%;
-            background: white;
-            border-radius: 2rem;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
+            height: 100%;
+            background: radial-gradient(ellipse at 40% 50%, rgba(100, 70, 200, 0.2), transparent 70%);
+            pointer-events: none;
+            z-index: 0;
         }
 
-        .header {
-            background: #0f172a;
-            padding: 2rem;
+        /* floating particles animation */
+        @keyframes floatGlow {
+            0% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+            100% { transform: translateY(-40px) rotate(8deg); opacity: 0.8; }
+        }
+
+        /* main 3D card with transform-style */
+        .vault-card {
+            max-width: 680px;
+            width: 100%;
+            background: rgba(8, 12, 25, 0.75);
+            backdrop-filter: blur(16px);
+            border-radius: 3rem;
+            box-shadow: 0 45px 70px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(180, 130, 255, 0.25), 0 20px 40px -10px rgba(0,0,0,0.5);
+            transform-style: preserve-3d;
+            transform: rotateX(2deg) rotateY(0.5deg) translateZ(10px);
+            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            animation: cardFloat 6s infinite ease-in-out;
+            z-index: 10;
+        }
+
+        @keyframes cardFloat {
+            0% { transform: rotateX(2deg) rotateY(0.5deg) translateY(0px); }
+            50% { transform: rotateX(1.5deg) rotateY(0.8deg) translateY(-8px); box-shadow: 0 55px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(200, 160, 255, 0.4); }
+            100% { transform: rotateX(2deg) rotateY(0.5deg) translateY(0px); }
+        }
+
+        .vault-card:hover {
+            transform: rotateX(0deg) rotateY(2deg) translateZ(20px);
+            box-shadow: 0 60px 90px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(160, 120, 255, 0.5);
+        }
+
+        /* HEADER with LARGER LOGO + 3D shadow */
+        .hero-header {
+            background: linear-gradient(145deg, #0c1022cc, #050814dd);
+            padding: 2rem 2rem 1.8rem 2rem;
             text-align: center;
-            color: white;
+            border-bottom: 1px solid rgba(170, 140, 250, 0.4);
+            border-radius: 3rem 3rem 0 0;
+            backdrop-filter: blur(4px);
         }
 
-        .header h1 {
+        .logo-banner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.2rem;
+        }
+
+        /* BIGGER LOGO with intense 3d shadow and animation */
+        .logo-wrapper {
+            filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 18px #aa7eff);
+            transition: all 0.3s ease;
+            transform: scale(1.02);
+            animation: logoPulse 3s infinite alternate;
+        }
+
+        @keyframes logoPulse {
+            0% { filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6)) drop-shadow(0 0 8px #b77eff); transform: scale(1); }
+            100% { filter: drop-shadow(0 18px 30px rgba(0,0,0,0.8)) drop-shadow(0 0 24px #d9aaff); transform: scale(1.05); }
+        }
+
+        .logo-wrapper img {
+            width: 110px;
+            height: 110px;
+            object-fit: contain;
+            border-radius: 60px;
+            background: rgba(15, 12, 35, 0.5);
+            padding: 8px;
+            transition: transform 0.3s, filter 0.3s;
+            border: 2px solid rgba(210, 180, 255, 0.5);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .logo-wrapper img:hover {
+            transform: rotate(3deg) scale(1.02);
+            filter: brightness(1.1);
+        }
+
+        .shadow-brand {
+            background: linear-gradient(135deg, #f0eaff, #c38eff, #a66eff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            font-size: 2.3rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            text-shadow: 0 0 10px rgba(160, 100, 255, 0.5);
+            position: relative;
+        }
+
+        .brand-tagline {
+            font-size: 0.8rem;
+            color: #b9c6ff;
+            letter-spacing: 1.5px;
+            margin-top: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+            background: rgba(0,0,0,0.3);
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 40px;
+            backdrop-filter: blur(2px);
+        }
+
+        .hero-header h1 {
             font-size: 2rem;
-            margin-bottom: 0.5rem;
+            font-weight: 800;
+            background: linear-gradient(145deg, #ffffff, #cdb4ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin: 0.8rem 0 0.2rem;
         }
 
-        .header p {
-            opacity: 0.8;
+        /* content 3D spacing */
+        .content-core {
+            padding: 2rem 2rem 1.8rem;
         }
 
-        .content {
-            padding: 2rem;
-        }
-
-        .search-box {
+        .search-field {
             margin-bottom: 2rem;
         }
 
-        label {
+        .search-field label {
             font-weight: 600;
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.8rem;
+            color: #e0d6ff;
             font-size: 0.9rem;
+            letter-spacing: 0.3px;
+            text-shadow: 0 1px 2px black;
+        }
+
+        .input-group {
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bc9eff;
+            font-size: 1.3rem;
+            filter: drop-shadow(0 0 5px #a46eff);
         }
 
         input {
             width: 100%;
-            padding: 1rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 1rem;
+            padding: 1.1rem 1rem 1.1rem 3.2rem;
+            background: rgba(18, 22, 45, 0.95);
+            border: 1.5px solid #42457a;
+            border-radius: 1.8rem;
             font-size: 1rem;
-            transition: 0.2s;
+            color: #f2ecff;
+            font-weight: 500;
+            transition: all 0.3s;
+            font-family: 'Inter', monospace;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.2);
         }
 
         input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+            border-color: #c88eff;
+            box-shadow: 0 0 0 4px rgba(170, 100, 255, 0.4), inset 0 0 5px #000;
+            transform: scale(1.01);
         }
 
-        button {
+        /* 3D animated button with ripple */
+        .btn-glow {
             width: 100%;
-            background: #667eea;
-            color: white;
+            background: linear-gradient(115deg, #6c2bd9, #a145f0);
             border: none;
-            padding: 1rem;
-            border-radius: 1rem;
-            font-size: 1rem;
-            font-weight: 600;
+            padding: 1.1rem;
+            border-radius: 2.2rem;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: white;
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 12px 28px rgba(108, 43, 217, 0.5), 0 4px 12px rgba(0,0,0,0.4);
+            transform: translateY(0);
+            position: relative;
+            overflow: hidden;
         }
 
-        button:hover {
-            background: #5a67d8;
-            transform: translateY(-2px);
+        .btn-glow:hover {
+            background: linear-gradient(115deg, #8b43ff, #bc6eff);
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 20px 35px rgba(140, 70, 255, 0.6);
         }
 
+        /* result with glassmorphic 3D */
         .result {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            border-radius: 1rem;
+            margin-top: 1.8rem;
+            padding: 1rem 1.2rem;
+            border-radius: 1.6rem;
             display: none;
+            backdrop-filter: blur(12px);
+            animation: fadeSlideUp 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+            font-weight: 500;
+            transform: translateZ(8px);
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.97);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .result.success {
-            background: #d4edda;
-            color: #155724;
-            border-left: 4px solid #28a745;
-            display: block;
+            background: rgba(30, 80, 40, 0.25);
+            border-left: 6px solid #7aff87;
+            color: #e0ffea;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(90, 255, 90, 0.2);
         }
 
         .result.error {
-            background: #f8d7da;
-            color: #721c24;
-            border-left: 4px solid #dc3545;
-            display: block;
+            background: rgba(180, 40, 40, 0.25);
+            border-left: 6px solid #ff7373;
+            color: #ffe0e0;
         }
 
         .password-value {
-            font-family: monospace;
-            font-size: 1.2rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 1.25rem;
             font-weight: bold;
-            background: white;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            margin-top: 0.5rem;
+            background: #0a0d1c;
+            padding: 0.8rem;
+            border-radius: 1.2rem;
+            margin-top: 0.7rem;
             text-align: center;
             word-break: break-all;
+            color: #e7ddff;
+            border: 1px solid #6959c7;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.3);
         }
 
-        .footer {
-            padding: 1rem;
-            text-align: center;
-            background: #f8f9fa;
-            font-size: 0.8rem;
-            color: #6c757d;
-        }
-
-        .admin-link {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .stats {
+        .stats-module {
             margin-top: 1rem;
-            padding: 0.5rem;
             text-align: center;
-            font-size: 0.8rem;
-            color: #6c757d;
+            font-size: 0.75rem;
+            color: #b2a6f0;
+            background: rgba(0, 0, 0, 0.45);
+            padding: 0.5rem 1rem;
+            border-radius: 3rem;
+            display: inline-block;
+            width: auto;
+            backdrop-filter: blur(8px);
+            letter-spacing: 0.5px;
+        }
+
+        /* social 3D modern buttons */
+        .social-links {
+            display: flex;
+            gap: 1.2rem;
+            margin-top: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .social-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: rgba(20, 22, 50, 0.75);
+            backdrop-filter: blur(10px);
+            border-radius: 2.5rem;
+            padding: 0.9rem 0;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            border: 1px solid rgba(200, 170, 255, 0.5);
+            color: white;
+            font-size: 1rem;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.3);
+            transform: translateZ(5px);
+        }
+
+        .social-btn i {
+            font-size: 1.6rem;
+            filter: drop-shadow(0 2px 4px black);
+        }
+
+        .telegram-btn {
+            background: linear-gradient(145deg, #1e2f5a, #142044);
+            border-bottom: 2px solid #3b82f6;
+        }
+
+        .telegram-btn:hover {
+            background: #2c4b8c;
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 20px 30px -10px #1e3a8a;
+        }
+
+        .youtube-btn {
+            background: linear-gradient(145deg, #6e1a1a, #4a0e0e);
+            border-bottom: 2px solid #ff3b3b;
+        }
+
+        .youtube-btn:hover {
+            background: #b91c1c;
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 20px 30px -10px #b91c1c;
+        }
+
+        .footer-note {
+            padding: 1rem 1.5rem 1.2rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #8b83c2;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .admin-badge {
+            color: #cbadff;
+            text-decoration: none;
+            font-weight: 700;
+            transition: 0.2s;
+        }
+
+        .admin-badge:hover {
+            color: #f0e6ff;
+            text-shadow: 0 0 8px #a777ff;
+        }
+
+        @media (max-width: 550px) {
+            .logo-wrapper img {
+                width: 80px;
+                height: 80px;
+            }
+            .shadow-brand {
+                font-size: 1.8rem;
+            }
+            .hero-header h1 {
+                font-size: 1.6rem;
+            }
+            .content-core {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🔐 KeyVault</h1>
-            <p>Enter file name to get your password</p>
-        </div>
-        <div class="content">
-            <div class="search-box">
-                <label>📄 File Name / Identifier</label>
-                <input type="text" id="filenameInput" placeholder="e.g., project_report.pdf, secret_notes, api_keys" autocomplete="off">
+
+<div class="vault-card">
+    <div class="hero-header">
+        <div class="logo-banner">
+            <!-- BIGGER LOGO with enhanced shadow & animation -->
+            <div class="logo-wrapper">
+                <img src="https://i.ibb.co/zhKgCdvT/gi.png" alt="Shadow Core Emblem">
             </div>
-            <button id="getPasswordBtn">🔓 Get Password</button>
-            <div id="result" class="result"></div>
-            <div class="stats" id="stats"></div>
+            <div class="shadow-brand">
+                SHADOW <span>CHEATS</span>
+            </div>
         </div>
-        <div class="footer">
-            🔒 Secure credential storage | 
-            <a href="admin.html" class="admin-link">Admin Panel →</a>
+        <div class="brand-tagline">
+            <i class="fas fa-dragon"></i>  THE ULTIMATE VAULT  <i class="fas fa-crown"></i>
+        </div>
+        <h1>
+            <i class="fas fa-cube"></i> KeyVault 3D
+        </h1>
+        <p style="font-size: 0.8rem; margin-top: 0.3rem; opacity: 0.8;">next-gen · encrypted · holographic access</p>
+    </div>
+
+    <div class="content-core">
+        <div class="search-field">
+            <label><i class="fas fa-key"></i> FILE IDENTIFIER / TOKEN</label>
+            <div class="input-group">
+                <i class="fas fa-fingerprint"></i>
+                <input type="text" id="filenameInput" placeholder="e.g., master_key, config_secret, project_report" autocomplete="off">
+            </div>
+        </div>
+
+        <button id="getPasswordBtn" class="btn-glow">
+            <i class="fas fa-unlock-alt"></i> RETRIEVE CREDENTIALS
+        </button>
+
+        <div id="result" class="result"></div>
+
+        <div style="display: flex; justify-content: center;">
+            <div class="stats-module" id="stats">
+                <i class="fas fa-spinner fa-pulse"></i> loading shadow vault...
+            </div>
+        </div>
+
+        <!-- Telegram & YouTube with 3D hover -->
+        <div class="social-links">
+            <a href="https://t.me/+txCC6oFj8iszZWJk" target="_blank" rel="noopener noreferrer" class="social-btn telegram-btn">
+                <i class="fab fa-telegram-plane"></i> <span>Telegram</span>
+            </a>
+            <a href="https://youtube.com/@theshadowcheats?si=tVA5CMG-_Ru7ZlNX" target="_blank" rel="noopener noreferrer" class="social-btn youtube-btn">
+                <i class="fab fa-youtube"></i> <span>YouTube</span>
+            </a>
         </div>
     </div>
 
-    <script>
-        // YOUR GITHUB RAW URL - Configured for your repo
-        const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/shadowsupportmail-create/KEY-FOR-CONFIG/main/keys.json';
-        
-        let keysCache = null;
+    <div class="footer-note">
+        <i class="fas fa-shield-haltered"></i> secure enclave · <a href="admin.html" class="admin-badge">Admin Panel <i class="fas fa-arrow-right"></i></a>
+    </div>
+</div>
 
-        async function loadKeys() {
-            try {
-                const response = await fetch(GITHUB_RAW_URL + '?t=' + Date.now());
-                if (!response.ok) throw new Error('Failed to load');
-                keysCache = await response.json();
-                const count = Object.keys(keysCache).length;
-                document.getElementById('stats').innerHTML = `📚 ${count} credential(s) available`;
+<script>
+    // ========================
+    // SHADOW VAULT 3D ENGINE
+    // ========================
+    const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/shadowsupportmail-create/KEY-FOR-CONFIG/main/keys.json';
+    
+    let keysCache = null;
+    let lastFetch = 0;
+
+    async function loadKeys(force = false) {
+        try {
+            if (keysCache && !force && (Date.now() - lastFetch < 35000)) {
+                updateStatsUI();
                 return keysCache;
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('stats').innerHTML = '⚠️ Unable to load credentials';
-                return null;
             }
+            const resp = await fetch(GITHUB_RAW_URL + '?nocache=' + Date.now());
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const data = await resp.json();
+            if (data && typeof data === 'object') {
+                keysCache = data;
+                lastFetch = Date.now();
+                updateStatsUI();
+                return keysCache;
+            }
+            throw new Error('invalid format');
+        } catch (err) {
+            console.warn(err);
+            const statsDiv = document.getElementById('stats');
+            if (statsDiv) {
+                if (keysCache) statsDiv.innerHTML = `<i class="fas fa-database"></i> offline mode · ${Object.keys(keysCache).length} cached keys`;
+                else statsDiv.innerHTML = `<i class="fas fa-skull"></i> vault unreachable`;
+            }
+            return keysCache;
         }
+    }
 
-        async function getPassword() {
-            const filename = document.getElementById('filenameInput').value.trim();
-            const resultDiv = document.getElementById('result');
-            
-            if (!filename) {
-                resultDiv.className = 'result error';
-                resultDiv.innerHTML = '❌ Please enter a file name';
-                return;
-            }
-
-            resultDiv.innerHTML = '⏳ Searching...';
-            resultDiv.className = 'result';
-            resultDiv.style.display = 'block';
-
-            const data = await loadKeys();
-            
-            if (!data) {
-                resultDiv.className = 'result error';
-                resultDiv.innerHTML = '❌ Unable to load credentials. Please try again later.';
-                return;
-            }
-
-            // Case-insensitive search
-            const match = Object.keys(data).find(key => key.toLowerCase() === filename.toLowerCase());
-            
-            if (match) {
-                resultDiv.className = 'result success';
-                resultDiv.innerHTML = `
-                    ✅ <strong>Password Found!</strong>
-                    <div class="password-value">🔑 ${escapeHtml(data[match])}</div>
-                    <div style="margin-top: 0.5rem; font-size: 0.85rem;">for: ${escapeHtml(match)}</div>
-                `;
-            } else {
-                resultDiv.className = 'result error';
-                resultDiv.innerHTML = `❌ No password found for "${escapeHtml(filename)}"<br><small>Tip: Check exact spelling or contact admin</small>`;
-            }
+    function updateStatsUI() {
+        const statsDiv = document.getElementById('stats');
+        if (statsDiv && keysCache) {
+            const count = Object.keys(keysCache).length;
+            statsDiv.innerHTML = `<i class="fas fa-shield-alt"></i> ${count} encrypted assets · shadow protocol`;
+        } else if (statsDiv && !keysCache) {
+            statsDiv.innerHTML = `<i class="fas fa-hourglass-half"></i> synchronizing vault...`;
         }
+    }
 
-        function escapeHtml(str) {
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
-        }
-
-        document.getElementById('getPasswordBtn').addEventListener('click', getPassword);
-        document.getElementById('filenameInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') getPassword();
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
         });
+    }
 
-        // Load initial stats
-        loadKeys();
-    </script>
+    // animated shake for missing input
+    function shake3D(element) {
+        if (!element) return;
+        element.style.transform = 'translateX(6px)';
+        setTimeout(() => { if(element) element.style.transform = 'translateX(-5px)'; }, 70);
+        setTimeout(() => { if(element) element.style.transform = 'translateX(3px)'; }, 140);
+        setTimeout(() => { if(element) element.style.transform = 'translateX(0)'; }, 210);
+    }
+
+    async function getPassword() {
+        const inputEl = document.getElementById('filenameInput');
+        const filename = inputEl.value.trim();
+        const resultDiv = document.getElementById('result');
+        
+        if (!filename) {
+            resultDiv.className = 'result error';
+            resultDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> <strong>Access denied</strong><br>Enter a valid credential ID.';
+            resultDiv.style.display = 'block';
+            shake3D(inputEl);
+            return;
+        }
+
+        resultDiv.className = 'result';
+        resultDiv.innerHTML = '<i class="fas fa-cog fa-spin"></i> decrypting vault entries...';
+        resultDiv.style.display = 'block';
+
+        const data = await loadKeys(true);
+        
+        if (!data || Object.keys(data).length === 0) {
+            resultDiv.className = 'result error';
+            resultDiv.innerHTML = '<i class="fas fa-ban"></i> <strong>Vault Offline</strong><br>Cannot retrieve credentials. Check network.';
+            return;
+        }
+
+        const matchedKey = Object.keys(data).find(k => k.toLowerCase() === filename.toLowerCase());
+        
+        if (matchedKey) {
+            const pass = data[matchedKey];
+            resultDiv.className = 'result success';
+            resultDiv.innerHTML = `
+                <i class="fas fa-check-double"></i> <strong>Credential Unlocked</strong>
+                <div class="password-value"><i class="fas fa-key"></i> ${escapeHtml(pass)}</div>
+                <div style="margin-top: 0.5rem; font-size: 0.8rem;"><i class="fas fa-hashtag"></i> ${escapeHtml(matchedKey)}</div>
+            `;
+        } else {
+            resultDiv.className = 'result error';
+            resultDiv.innerHTML = `<i class="fas fa-ghost"></i> <strong>No Match Found</strong><br>“${escapeHtml(filename)}” not in secure index.<br><small>⛓️ contact administrator or check spelling</small>`;
+        }
+    }
+
+    // event binding + 3D hover effects
+    document.getElementById('getPasswordBtn').addEventListener('click', getPassword);
+    const inputField = document.getElementById('filenameInput');
+    inputField.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') getPassword();
+    });
+
+    // initial load + extra animation for stats
+    (async function initVault() {
+        await loadKeys();
+        const statsDiv = document.getElementById('stats');
+        if (keysCache) {
+            statsDiv.innerHTML = `<i class="fas fa-crown"></i> ${Object.keys(keysCache).length} shadow keys · active`;
+        } else {
+            statsDiv.innerHTML = `<i class="fas fa-sync-alt"></i> connecting to distributed vault...`;
+        }
+    })();
+
+    // extra 3D tilt effect on card using mouse move? (optional micro)
+    const card = document.querySelector('.vault-card');
+    if (card) {
+        document.body.addEventListener('mousemove', (e) => {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 35;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 35;
+            if (card) {
+                card.style.transform = `rotateX(${yAxis * 0.5}deg) rotateY(${xAxis * -0.3}deg) translateZ(10px)`;
+            }
+        });
+        document.body.addEventListener('mouseleave', () => {
+            if (card) card.style.transform = 'rotateX(2deg) rotateY(0.5deg) translateZ(5px)';
+        });
+    }
+
+    // add ripple effect to button dynamically (rich)
+    const btn = document.getElementById('getPasswordBtn');
+    btn.addEventListener('mousedown', function(e) {
+        const rippleSpan = document.createElement('span');
+        rippleSpan.classList.add('ripple');
+        const rect = btn.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+        rippleSpan.style.width = rippleSpan.style.height = `${size}px`;
+        rippleSpan.style.left = `${x}px`;
+        rippleSpan.style.top = `${y}px`;
+        rippleSpan.style.position = 'absolute';
+        rippleSpan.style.background = 'rgba(255, 220, 255, 0.5)';
+        rippleSpan.style.borderRadius = '50%';
+        rippleSpan.style.transform = 'scale(0)';
+        rippleSpan.style.transition = 'transform 0.5s, opacity 0.6s';
+        rippleSpan.style.pointerEvents = 'none';
+        btn.style.position = 'relative';
+        btn.style.overflow = 'hidden';
+        btn.appendChild(rippleSpan);
+        setTimeout(() => { rippleSpan.style.transform = 'scale(4)'; rippleSpan.style.opacity = '0'; }, 10);
+        setTimeout(() => { if(rippleSpan && rippleSpan.remove) rippleSpan.remove(); }, 550);
+    });
+
+    // extra style for ripples
+    const styleRipple = document.createElement('style');
+    styleRipple.textContent = `
+        .btn-glow .ripple {
+            animation: none;
+        }
+        .result .password-value {
+            transition: all 0.2s;
+        }
+        .social-btn {
+            transition: all 0.25s cubic-bezier(0.2, 1.2, 0.3, 1);
+        }
+        input, .btn-glow {
+            transition: all 0.25s ease-out;
+        }
+    `;
+    document.head.appendChild(styleRipple);
+</script>
 </body>
 </html>
