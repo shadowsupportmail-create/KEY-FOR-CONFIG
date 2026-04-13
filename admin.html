@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Manage Multiple Keys</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: #1a1a2e;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .header {
+            background: #0f172a;
+            padding: 1.5rem 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+        }
+
+        .back-link {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .back-link:hover {
+            color: white;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .github-setup {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            border-radius: 0.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .github-setup h3 {
+            color: #92400e;
+            margin-bottom: 0.5rem;
+        }
+
+        .github-setup input {
+            font-family: monospace;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .info-text {
+            background: #dbeafe;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #0f172a;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.8rem;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 0.8rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        button.danger {
+            background: #ef4444;
+        }
+
+        button.danger:hover {
+            background: #dc2626;
+        }
+
+        button.success {
+            background: #10b981;
+        }
+
+        button.success:hover {
+            background: #059669;
+        }
+
+        .flex-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 0.8rem;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+            display: block;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+            display: block;
+        }
+
+        .entries-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .entries-table th,
+        .entries-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .entries-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .entries-table tr:hover {
+            background: #f1f5f9;
+        }
+
+        .edit-btn, .delete-btn {
+            padding: 0.3rem 0.8rem;
+            margin: 0 0.2rem;
+            font-size: 0.8rem;
+        }
+
+        .edit-btn {
+            background: #3b82f6;
+        }
+
+        .delete-btn {
+            background: #ef4444;
+        }
+
+        .search-bar {
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .search-bar input {
+            flex: 1;
+        }
+
+        hr {
+            margin: 1.5rem 0;
+            border: none;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .batch-area {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        textarea {
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1>🛡️ Admin Panel - KeyVault Manager</h1>
+                <a href="index.html" class="back-link">← Back to Public Page</a>
+            </div>
+            <div class="content">
+                <div id="message" class="message"></div>
+
+                <div class="github-setup">
+                    <h3>⚙️ GitHub Configuration (One-Time Setup)</h3>
+                    <p><strong>Your Repository:</strong> shadowsupportmail-create/KEY-FOR-CONFIG</p>
+                    <input type="password" id="githubToken" placeholder="Enter your GitHub Personal Access Token (with 'repo' scope)">
+                    <div class="info-text">
+                        💡 <strong>Don't have a token?</strong> Create one at: GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)<br>
+                        ✅ Must check the <strong>repo</strong> permission scope.
+                    </div>
+                    <button id="saveSettingsBtn" style="margin-top: 0.5rem; background: #10b981;">💾 Save Token</button>
+                </div>
+
+                <hr>
+
+                <h3>➕ Add / Edit Single Entry</h3>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>📄 File Name (Key)</label>
+                        <input type="text" id="filename" placeholder="e.g., project_report.pdf">
+                    </div>
+                    <div class="input-group">
+                        <label>🔑 Password (Value)</label>
+                        <input type="text" id="password" placeholder="Secret password">
+                    </div>
+                </div>
+
+                <div class="flex-buttons">
+                    <button id="addBtn">➕ Add / Update Entry</button>
+                    <button id="deleteBtn" class="danger">🗑️ Delete Entry</button>
+                    <button id="syncBtn" class="success">🔄 Sync to GitHub Now</button>
+                </div>
+
+                <hr>
+
+                <h3>📦 Batch Import (Multiple Keys at Once)</h3>
+                <div class="batch-area">
+                    <label>Paste JSON with multiple keys:</label>
+                    <textarea id="batchJson" rows="5" placeholder='{
+  "file1.pdf": "pass123",
+  "file2.docx": "secret456",
+  "api_key_prod": "abc-123-xyz"
+}'></textarea>
+                    <div class="flex-buttons" style="margin-top: 0.5rem;">
+                        <button id="batchAddBtn">📦 Import Multiple Keys</button>
+                        <button id="clearAllBtn" class="danger">⚠️ Clear All Keys</button>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="🔍 Search file names...">
+                    <button id="exportBtn">📥 Export JSON</button>
+                </div>
+
+                <h3>📋 All Credentials (<span id="entryCount">0</span> keys)</h3>
+                <div style="overflow-x: auto;">
+                    <table class="entries-table" id="entriesTable">
+                        <thead>
+                            <tr><th>File Name</th><th>Password</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let keysData = {};
+        
+        // YOUR REPO INFO (Pre-configured)
+        const GITHUB_REPO = 'shadowsupportmail-create/KEY-FOR-CONFIG';
+        const FILE_PATH = 'keys.json';
+        
+        // Default demo data with multiple keys
+        const defaultKeys = {
+            "financial_report_2025": "FinSecure#99",
+            "user_manual_v3": "readme2024!",
+            "backup_secret": "B4ckup-Key-789",
+            "api_keys_production": "sk_live_abc123xyz",
+            "database_credentials": "db_pass_2025!",
+            "website_config": "wp_admin_secure"
+        };
+
+        // Load token from localStorage
+        function loadToken() {
+            const token = localStorage.getItem('github_token');
+            if (token) document.getElementById('githubToken').value = token;
+        }
+
+        function saveToken() {
+            const token = document.getElementById('githubToken').value.trim();
+            if (!token) {
+                showMessage('❌ Please enter a valid GitHub token', 'error');
+                return;
+            }
+            localStorage.setItem('github_token', token);
+            showMessage('✅ Token saved securely! You can now sync to GitHub.', 'success');
+        }
+
+        function loadLocalData() {
+            const saved = localStorage.getItem('multi_keys_data');
+            if (saved) {
+                try {
+                    keysData = JSON.parse(saved);
+                } catch(e) {}
+            }
+            if (Object.keys(keysData).length === 0) {
+                keysData = {...defaultKeys};
+            }
+            renderTable();
+            saveToLocal();
+        }
+
+        function saveToLocal() {
+            localStorage.setItem('multi_keys_data', JSON.stringify(keysData));
+        }
+
+        function showMessage(msg, type) {
+            const msgDiv = document.getElementById('message');
+            msgDiv.className = `message ${type}`;
+            msgDiv.innerHTML = msg;
+            setTimeout(() => {
+                msgDiv.style.display = 'none';
+            }, 4000);
+        }
+
+        function renderTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = Object.entries(keysData).filter(([key]) => 
+                key.toLowerCase().includes(searchTerm)
+            );
+            
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            for (const [filename, password] of filtered) {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td><strong>${escapeHtml(filename)}</strong></td>
+                    <td><span style="font-family: monospace;">${escapeHtml(password)}</span></td>
+                    <td>
+                        <button class="edit-btn" onclick='editEntry("${escapeHtml(filename)}", "${escapeHtml(password)}")'>✏️ Edit</button>
+                        <button class="delete-btn" onclick='deleteEntryByName("${escapeHtml(filename)}")'>🗑️</button>
+                    </td>
+                `;
+            }
+            
+            document.getElementById('entryCount').innerText = Object.keys(keysData).length;
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #6c757d;">No entries found</td></tr>';
+            }
+        }
+
+        function editEntry(filename, password) {
+            document.getElementById('filename').value = filename;
+            document.getElementById('password').value = password;
+        }
+
+        function deleteEntryByName(filename) {
+            if (confirm(`Delete "${filename}"?`)) {
+                delete keysData[filename];
+                saveToLocal();
+                renderTable();
+                showMessage(`🗑️ Deleted "${filename}"`, 'success');
+            }
+        }
+
+        function addOrUpdate() {
+            const filename = document.getElementById('filename').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            if (!filename) {
+                showMessage('❌ File name cannot be empty', 'error');
+                return;
+            }
+            if (!password) {
+                showMessage('❌ Password cannot be empty', 'error');
+                return;
+            }
+
+            const isUpdate = keysData.hasOwnProperty(filename);
+            keysData[filename] = password;
+            saveToLocal();
+            renderTable();
+
+            showMessage(`✅ ${isUpdate ? 'Updated' : 'Added'} "${filename}"`, 'success');
+            document.getElementById('filename').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function deleteCurrent() {
+            const filename = document.getElementById('filename').value.trim();
+            if (!filename) {
+                showMessage('❌ Enter file name to delete', 'error');
+                return;
+            }
+            if (!keysData[filename]) {
+                showMessage(`❌ "${filename}" not found`, 'error');
+                return;
+            }
+            delete keysData[filename];
+            saveToLocal();
+            renderTable();
+            showMessage(`🗑️ Deleted "${filename}"`, 'success');
+            document.getElementById('filename').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function batchImport() {
+            const jsonText = document.getElementById('batchJson').value.trim();
+            if (!jsonText) {
+                showMessage('❌ Paste JSON data first', 'error');
+                return;
+            }
+            try {
+                const imported = JSON.parse(jsonText);
+                if (typeof imported !== 'object' || imported === null) {
+                    throw new Error('Invalid format');
+                }
+                let added = 0;
+                for (const [key, value] of Object.entries(imported)) {
+                    if (typeof value === 'string') {
+                        keysData[key] = value;
+                        added++;
+                    }
+                }
+                saveToLocal();
+                renderTable();
+                showMessage(`✅ Imported ${added} keys successfully!`, 'success');
+                document.getElementById('batchJson').value = '';
+            } catch(e) {
+                showMessage('❌ Invalid JSON format. Use valid JSON object.', 'error');
+            }
+        }
+
+        function clearAllKeys() {
+            if (confirm('⚠️ DANGER: This will delete ALL keys. Are you sure?')) {
+                keysData = {};
+                saveToLocal();
+                renderTable();
+                showMessage('🗑️ All keys cleared', 'info');
+            }
+        }
+
+        function exportJSON() {
+            const dataStr = JSON.stringify(keysData, null, 2);
+            const blob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `keys_backup_${new Date().toISOString().slice(0,19)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showMessage('📁 JSON exported!', 'success');
+        }
+
+        async function syncToGitHub() {
+            const token = localStorage.getItem('github_token');
+            
+            if (!token) {
+                showMessage('❌ Please configure your GitHub token in the settings above first', 'error');
+                return;
+            }
+
+            showMessage('🔄 Syncing to GitHub... This may take a few seconds.', 'info');
+            
+            const content = btoa(unescape(encodeURIComponent(JSON.stringify(keysData, null, 2))));
+            
+            const apiUrl = `https://api.github.com/repos/${GITHUB_REPO}/contents/${FILE_PATH}`;
+            
+            try {
+                // First, get current file SHA if exists
+                let sha = null;
+                try {
+                    const getResponse = await fetch(apiUrl, {
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+                    if (getResponse.ok) {
+                        const data = await getResponse.json();
+                        sha = data.sha;
+                    }
+                } catch(e) {
+                    // File might not exist yet
+                }
+                
+                const putResponse = await fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/vnd.github.v3+json'
+                    },
+                    body: JSON.stringify({
+                        message: `Update keys.json - ${new Date().toLocaleString()}`,
+                        content: content,
+                        sha: sha,
+                        branch: 'main'
+                    })
+                });
+                
+                if (putResponse.ok) {
+                    showMessage('✅ Successfully synced to GitHub! Public page will reflect changes within 1-2 minutes.', 'success');
+                } else {
+                    const error = await putResponse.json();
+                    showMessage(`❌ GitHub Error: ${error.message || 'Unknown error'}`, 'error');
+                }
+            } catch(error) {
+                showMessage(`❌ Sync failed: ${error.message}`, 'error');
+            }
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // Event listeners
+        document.getElementById('saveSettingsBtn').addEventListener('click', saveToken);
+        document.getElementById('addBtn').addEventListener('click', addOrUpdate);
+        document.getElementById('deleteBtn').addEventListener('click', deleteCurrent);
+        document.getElementById('batchAddBtn').addEventListener('click', batchImport);
+        document.getElementById('clearAllBtn').addEventListener('click', clearAllKeys);
+        document.getElementById('exportBtn').addEventListener('click', exportJSON);
+        document.getElementById('syncBtn').addEventListener('click', syncToGitHub);
+        document.getElementById('searchInput').addEventListener('input', renderTable);
+        
+        // Make functions global for inline onclick
+        window.editEntry = editEntry;
+        window.deleteEntryByName = deleteEntryByName;
+        
+        // Initialize
+        loadToken();
+        loadLocalData();
+    </script>
+</body>
+</html>
