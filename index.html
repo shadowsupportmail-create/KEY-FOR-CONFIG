@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KeyVault - Get Your Password</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #0f172a;
+            padding: 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.8;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .search-box {
+            margin-bottom: 2rem;
+        }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #0f172a;
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 1rem;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        button {
+            width: 100%;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .result {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 1rem;
+            display: none;
+        }
+
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+            display: block;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+            display: block;
+        }
+
+        .password-value {
+            font-family: monospace;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+            text-align: center;
+            word-break: break-all;
+        }
+
+        .footer {
+            padding: 1rem;
+            text-align: center;
+            background: #f8f9fa;
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .admin-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .stats {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 KeyVault</h1>
+            <p>Enter file name to get your password</p>
+        </div>
+        <div class="content">
+            <div class="search-box">
+                <label>📄 File Name / Identifier</label>
+                <input type="text" id="filenameInput" placeholder="e.g., project_report.pdf, secret_notes, api_keys" autocomplete="off">
+            </div>
+            <button id="getPasswordBtn">🔓 Get Password</button>
+            <div id="result" class="result"></div>
+            <div class="stats" id="stats"></div>
+        </div>
+        <div class="footer">
+            🔒 Secure credential storage | 
+            <a href="admin.html" class="admin-link">Admin Panel →</a>
+        </div>
+    </div>
+
+    <script>
+        // YOUR GITHUB RAW URL - Configured for your repo
+        const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/shadowsupportmail-create/KEY-FOR-CONFIG/main/keys.json';
+        
+        let keysCache = null;
+
+        async function loadKeys() {
+            try {
+                const response = await fetch(GITHUB_RAW_URL + '?t=' + Date.now());
+                if (!response.ok) throw new Error('Failed to load');
+                keysCache = await response.json();
+                const count = Object.keys(keysCache).length;
+                document.getElementById('stats').innerHTML = `📚 ${count} credential(s) available`;
+                return keysCache;
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('stats').innerHTML = '⚠️ Unable to load credentials';
+                return null;
+            }
+        }
+
+        async function getPassword() {
+            const filename = document.getElementById('filenameInput').value.trim();
+            const resultDiv = document.getElementById('result');
+            
+            if (!filename) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = '❌ Please enter a file name';
+                return;
+            }
+
+            resultDiv.innerHTML = '⏳ Searching...';
+            resultDiv.className = 'result';
+            resultDiv.style.display = 'block';
+
+            const data = await loadKeys();
+            
+            if (!data) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = '❌ Unable to load credentials. Please try again later.';
+                return;
+            }
+
+            // Case-insensitive search
+            const match = Object.keys(data).find(key => key.toLowerCase() === filename.toLowerCase());
+            
+            if (match) {
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = `
+                    ✅ <strong>Password Found!</strong>
+                    <div class="password-value">🔑 ${escapeHtml(data[match])}</div>
+                    <div style="margin-top: 0.5rem; font-size: 0.85rem;">for: ${escapeHtml(match)}</div>
+                `;
+            } else {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ No password found for "${escapeHtml(filename)}"<br><small>Tip: Check exact spelling or contact admin</small>`;
+            }
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        document.getElementById('getPasswordBtn').addEventListener('click', getPassword);
+        document.getElementById('filenameInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') getPassword();
+        });
+
+        // Load initial stats
+        loadKeys();
+    </script>
+</body>
+</html>
